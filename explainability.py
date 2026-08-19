@@ -4,7 +4,6 @@ Explainability stack for the trained ViT-B/16 (paper Sec. 3.5 / 4.2).
 Four methods: attention rollout, Grad-CAM, LIME, and grid-based regional
 analysis. 
 
-
 """
 
 import argparse
