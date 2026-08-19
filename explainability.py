@@ -2,21 +2,9 @@
 Explainability stack for the trained ViT-B/16 (paper Sec. 3.5 / 4.2).
 
 Four methods: attention rollout, Grad-CAM, LIME, and grid-based regional
-analysis. Produces the three-block figure and the regional importance table.
+analysis. 
 
-Usage:
-    python explain.py --ckpt results/vit_seed42.pt --labels data/labels.csv \
-                      --roots data/ADNI data/OASIS
-    python explain.py --ckpt ... --check-orientation   # run this FIRST
 
-WARNING -- read before quoting anatomy:
-  * The 6x6 grid assumes a canonical-RAS AXIAL slice with frontal at the top.
-    A flipped or transposed volume swaps the frontal and parietal labels while
-    leaving every number in the table unchanged and plausible-looking.
-    --check-orientation is the only way to see this. Run it once per dataset.
-  * Importance is PEAK-SCALED: the top region sits at ~1.0 by construction and
-    the rest are fractions of it. Report values as relative attention.
-  * The grid is a coarse lobar proxy, not an atlas-registered parcellation.
 """
 
 import argparse
