@@ -1,33 +1,4 @@
 #!/usr/bin/env python
-"""Generate the explainability stack for a trained ViT (paper Fig. 2, Table 2).
-
-Examples
---------
-Check slice orientation — run this ONCE per dataset, before anything else:
-
-    python explain.py --ckpt checkpoints/vit_seed42.pt --check-orientation
-
-Produce the figure and regional table:
-
-    python explain.py --ckpt checkpoints/vit_seed42.pt \
-                      --labels data/labels.csv --roots data/ADNI data/OASIS
-
-Report unscaled attention weights instead of peak-scaled ones:
-
-    python explain.py --ckpt checkpoints/vit_seed42.pt --scaling raw
-
-WARNING — read before quoting anatomy
--------------------------------------
-The 6x6 grid assumes a canonical-RAS axial slice with frontal at the top. A
-flipped or transposed volume swaps the frontal and parietal labels while leaving
-every number in the table unchanged and plausible-looking. --check-orientation
-is the only way to see this.
-
-Importance is peak-scaled by default: the top region sits at ~1.0 by
-construction and the rest are fractions of it. Report values as *relative*
-attention. The grid is a coarse lobar proxy, not an atlas-registered
-parcellation.
-"""
 
 from __future__ import annotations
 
