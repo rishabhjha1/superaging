@@ -17,7 +17,7 @@ find convergence on parietal, temporal, and frontal cortex — regions already
 implicated in cognitive preservation, recovered by a model given no regional
 priors.
 
-![Explainability stack](assets/explainability_stack.png)
+![Explainability stack](explainability_stack.png)
 
 ## Requirements
 
