@@ -1,21 +1,5 @@
 #!/usr/bin/env python
-"""Train and benchmark the five models (paper Table 1).
 
-Examples
---------
-Reproduce Table 1 (all five models, five seeds):
-
-    python train.py --labels data/labels.csv --roots data/ADNI data/OASIS
-
-Train only the proposed model and keep its checkpoints:
-
-    python train.py --models ViT --outdir results/vit
-
-Smoke test on synthetic data (no ADNI/OASIS access needed):
-
-    python scripts/make_synthetic_data.py --outdir data/synthetic
-    python train.py --config configs/synthetic.yaml
-"""
 
 from __future__ import annotations
 
