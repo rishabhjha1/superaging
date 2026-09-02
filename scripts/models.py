@@ -1,17 +1,4 @@
-"""Model architectures (paper Sec. 3.3).
 
-Five models of increasing representational capacity on identical
-(3, 224, 224) inputs, with one documented exception: DenseNet-40 trains on
-96 x 96, following the original CIFAR-scale design and to limit overfitting on
-high-resolution slices at this sample size.
-
-    Model         Params   Trainable   Pretrained
-    LogReg          --        --         no
-    LightweightCNN     ~0.02M    all          no
-    ResNet-18     ~11.2M    ~0.001M      ImageNet
-    DenseNet-40   ~1.02M    all          no
-    ViT-B/16      ~86M      ~0.6M        ImageNet   <- proposed
-"""
 
 from __future__ import annotations
 
