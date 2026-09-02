@@ -7,7 +7,7 @@ high-resolution slices at this sample size.
 
     Model         Params   Trainable   Pretrained
     LogReg          --        --         no
-    SimpleCNN     ~0.02M    all          no
+    LightweightCNN     ~0.02M    all          no
     ResNet-18     ~11.2M    ~0.001M      ImageNet
     DenseNet-40   ~1.02M    all          no
     ViT-B/16      ~86M      ~0.6M        ImageNet   <- proposed
@@ -78,10 +78,10 @@ class LogReg:
         return self.clf.predict_proba(z)[:, 1]
 
 
-class SimpleCNN(nn.Module):
+class LightweightCNN(nn.Module):
     """From-scratch two-block CNN applied per plane, features concatenated."""
 
-    name = "SimpleCNN"
+    name = "LightweightCNNCNN"
     pretrained_backbone = False
     is_torch = True
 
