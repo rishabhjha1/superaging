@@ -101,22 +101,6 @@ it beats 0.5 by more than two points.
 
 </details>
 
-## Evaluation
-
-To evaluate released checkpoints without retraining:
-
-```bash
-bash scripts/download_pretrained.sh checkpoints
-python eval.py --checkpoints 'checkpoints/vit_seed*.pt' \
-               --labels data/labels.csv --roots data/ADNI data/OASIS
-```
-
-`eval.py` reconstructs the exact split each checkpoint was trained under (the
-seed is stored in the checkpoint), runs the fold ensemble, and writes
-`eval_metrics.csv` plus per-subject predictions.
-
-
-
 ## Explainability
 
 
