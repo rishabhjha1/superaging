@@ -58,5 +58,5 @@ Optimization: AdamW optimizer, cosine annealing, class-balanced cross-entropy, a
 
 Splits: Subject-grouped and site-stratified 5-fold cross-validation.
 
-📄 License & Acknowledgements
-License: MIT (See LICENSE). Note: ADNI and OASIS datasets are governed by their respective data use agreements.
+📄 License
+MIT (See LICENSE). Note: ADNI and OASIS datasets are governed by their respective data use agreements.
