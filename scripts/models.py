@@ -248,13 +248,13 @@ class ViTNet(nn.Module):
 # ============================================================ REGISTRY
 MODELS: dict[str, type] = {
     "LogReg": LogReg,
-    "SimpleCNN": SimpleCNN,
+    "LightweightCNN": LightweightCNN,
     "ResNet18": ResNet18Net,
     "DenseNet40": DenseNet40,
     "ViT": ViTNet,
 }
 
-MODEL_ORDER = ["LogReg", "SimpleCNN", "ResNet18", "DenseNet40", "ViT"]
+MODEL_ORDER = ["LogReg", "LightweightCNN", "ResNet18", "DenseNet40", "ViT"]
 
 
 def build_model(name: str, cfg: Config):
