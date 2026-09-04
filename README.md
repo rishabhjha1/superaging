@@ -35,9 +35,10 @@ To reproduce the benchmark for all five models across five seeds (outputs to res
 
 ```Bash
 python train.py --labels data/labels.csv --roots data/ADNI data/OASIS --outdir results
+```
 To train a single model (e.g., ViT):
 
-Bash
+```Bash
 python train.py --models ViT --outdir results/vit
 ```
 5️⃣ Run Explainability
