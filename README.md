@@ -36,7 +36,7 @@ To reproduce the benchmark for all five models across five seeds (outputs to res
 ```Bash
 python train.py --labels data/labels.csv --roots data/ADNI data/OASIS --outdir results
 ```
-To train a single model (e.g., ViT):
+To train a single model :
 
 ```Bash
 python train.py --models ViT --outdir results/vit
