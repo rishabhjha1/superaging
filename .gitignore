@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+
+# Outputs and caches produced by train.py / eval.py / explain.py
+results/
+checkpoints/
+
+# Imaging data (not distributed; see data/README.md)
+data/ADNI/
+data/OASIS/
+data/labels.csv
+data/*.nii
+data/*.nii.gz
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

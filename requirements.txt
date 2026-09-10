@@ -8,3 +8,5 @@ torchvision>=0.15
 matplotlib>=3.7
 lime>=0.2.0.1
 scipy
+streamlit>=1.30  # only required for streamlit_app.py
+pyyaml>=6.0      # only required for --config YAML files

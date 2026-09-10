@@ -1,11 +1,12 @@
 """Streamlit demo for the SuperAger ViT-B/16 explainability pipeline.
 
-Local:   streamlit run app_streamlit.py
-Deploy:  share.streamlit.io -> repo, branch main, main file app_streamlit.py
+Local:   streamlit run streamlit_app.py
+Deploy:  share.streamlit.io -> repo, branch main, main file streamlit_app.py
 
-Only the four imports in the WIRE block below are project-specific. If a name
-or signature does not match your package, fix it there and nothing else in this
-file needs to change.
+Set SUPERAGER_CKPT to a checkpoint produced by train.py (e.g.
+results/checkpoints/vit_seed42.pt) to run the trained model; without one the
+pipeline still executes end to end on a randomly initialised head so the app
+can be smoke-tested, but the predictions are meaningless.
 """
 from __future__ import annotations
 
@@ -19,46 +20,40 @@ import pandas as pd
 import streamlit as st
 import torch
 
-# ---------------------------------------------------------------- WIRE ----
-# 1. build_vit()             -> nn.Module (frozen backbone + your head)
-# 2. volume_to_triplanar(v)  -> np.ndarray (3, 224, 224) float32 in [0, 1]
-# 3. attention_rollout(m, x) -> np.ndarray (224, 224) float32, one plane
-# 4. region_scores(saliency) -> dict {region: float}
-from superager.models.vit import build_vit
-from superager.data.preprocess import volume_to_triplanar
-from superager.explain.rollout import attention_rollout
-from superager.regions import region_scores, REGIONS
-# --------------------------------------------------------------------------
+from superager.config import Config
+from superager.data import AXIAL, CORONAL, SAGITTAL, normalise_volume, triplanar
+from superager.explain import attention_rollout, load_vit
+from superager.models import ViTNet
+from superager.regions import REGIONS, region_scores
 
-CKPT = Path(os.environ.get("SUPERAGER_CKPT", "checkpoints/vit_seed42.pt"))
-PLANES = ("axial", "coronal", "sagittal")
+CKPT = Path(os.environ.get("SUPERAGER_CKPT", "results/checkpoints/vit_seed42.pt"))
+PLANES = {"axial": AXIAL, "coronal": CORONAL, "sagittal": SAGITTAL}
 
 st.set_page_config(page_title="SuperAger explainability demo", layout="wide")
+
+cfg = Config()
+device = torch.device("cpu")
 
 
 @st.cache_resource(show_spinner="Loading model...")
 def load_model():
-    """Build the ViT and load the checkpoint. Returns (model, is_trained)."""
-    model = build_vit()
+    """Build the ViT and load the checkpoint. Returns (model, threshold, is_trained)."""
     if CKPT.exists():
-        state = torch.load(CKPT, map_location="cpu")
-        state = state.get("model", state.get("state_dict", state))
-        model.load_state_dict(state, strict=False)
-        trained = True
-    else:
-        trained = False  # smoke-test path: plumbing runs, numbers are meaningless
-    model.eval()
-    return model, trained
+        model, threshold = load_vit(str(CKPT), cfg, device)
+        return model, threshold, True
+    model = ViTNet(cfg).to(device).eval()
+    return model, 0.5, False  # smoke-test path: plumbing runs, numbers are meaningless
 
 
 @st.cache_data(show_spinner="Preprocessing volume...")
 def preprocess(raw: bytes, name: str) -> np.ndarray:
-    """Bytes from the uploader -> (3, 224, 224) float32."""
+    """Bytes from the uploader -> (3, size, size) float32, planes (axial, coronal, sagittal)."""
     suffix = ".nii.gz" if name.endswith(".gz") else ".nii"
     tmp = Path("/tmp") / f"upload{suffix}"
     tmp.write_bytes(raw)
-    vol = nib.as_closest_canonical(nib.load(str(tmp)))
-    return volume_to_triplanar(np.asanyarray(vol.dataobj).astype(np.float32))
+    volume = np.squeeze(nib.as_closest_canonical(nib.load(str(tmp))).get_fdata())
+    normalised = normalise_volume(volume.astype(np.float32), threshold=cfg.mask_threshold)
+    return triplanar(normalised, cfg.size_2d)
 
 
 def show_map(base: np.ndarray, overlay: np.ndarray | None, title: str):
@@ -78,7 +73,7 @@ st.caption(
     "processing and is not stored after the session ends."
 )
 
-model, trained = load_model()
+model, threshold, trained = load_model()
 if not trained:
     st.warning(
         f"No checkpoint at {CKPT} — running with an untrained head. "
@@ -90,25 +85,22 @@ if upload is None:
     st.info("Waiting for a .nii or .nii.gz file.")
     st.stop()
 
-x = preprocess(upload.getvalue(), upload.name)
-tensor = torch.from_numpy(x).unsqueeze(1).repeat(1, 3, 1, 1)  # (3 views, 3, H, W)
+x_np = preprocess(upload.getvalue(), upload.name)
+x = torch.from_numpy(x_np[None]).to(device)  # (1, 3, H, W): planes (axial, coronal, sagittal)
 
 with torch.no_grad():
-    logits = model(tensor)
-    if logits.ndim == 2 and logits.shape[0] == len(PLANES):
-        logits = logits.mean(0, keepdim=True)  # mean fusion across views
-    prob = torch.softmax(logits, dim=-1)[0, 1].item()
+    prob = torch.softmax(model(x), dim=1)[0, 1].item()
 
-st.metric("P(SuperAger)", f"{prob:.3f}")
+st.metric("P(SuperAger)", f"{prob:.3f}", delta=f"decision threshold {threshold:.2f}")
 st.progress(prob)
 
 st.subheader("Attention rollout")
 cols = st.columns(len(PLANES))
 saliency = {}
-for col, plane, view in zip(cols, PLANES, tensor):
+for col, (plane, plane_idx) in zip(cols, PLANES.items()):
     with col:
-        saliency[plane] = attention_rollout(model, view.unsqueeze(0))
-        show_map(x[PLANES.index(plane)], saliency[plane], plane)
+        saliency[plane] = attention_rollout(model, x, plane=plane_idx)
+        show_map(x_np[plane_idx], saliency[plane], plane)
 
 st.subheader("Regional analysis (axial)")
 scores = region_scores(saliency["axial"])
