@@ -222,9 +222,7 @@ If you use this code, please cite:
 }
 ```
 
-> 📝 Venue and year are placeholders — fill them in from the published record. The author list has been taken from the repository's commit history and should be corrected to match the paper.
 
-Please also follow the ADNI and OASIS citation requirements for the imaging data.
 
 ## 📄 License
 
