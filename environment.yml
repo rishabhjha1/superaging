@@ -1,0 +1,28 @@
+name: superager
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  # ---- scientific stack ----
+  - numpy>=1.24
+  - pandas>=2.0
+  - scipy>=1.10
+  - scikit-learn>=1.3
+  - scikit-image>=0.21
+  - matplotlib>=3.7
+  - pyyaml>=6.0
+  # ---- deep learning ----
+  # CPU build. For CUDA, replace `cpuonly` with e.g. `pytorch-cuda=12.1`
+  # and add the `nvidia` channel above.
+  - pytorch>=2.0
+  - torchvision>=0.15
+  - cpuonly
+  # ---- neuroimaging ----
+  - nibabel>=5.1
+  - pip:
+      # Not reliably packaged on conda-forge.
+      - lime>=0.2.0.1
+      # Only needed for streamlit_app.py.
+      - streamlit>=1.30

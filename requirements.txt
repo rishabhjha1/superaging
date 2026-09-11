@@ -8,3 +8,4 @@ torchvision>=0.15
 matplotlib>=3.7
 lime>=0.2.0.1
 scipy
+pyyaml>=6.0
