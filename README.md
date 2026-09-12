@@ -121,11 +121,11 @@ python train.py --labels data/labels.csv --roots data/ADNI data/OASIS --outdir r
 
 | Model | AUC | Balanced Acc. | AUPRC | Accuracy |
 |---|---|---|---|---|
-| LogReg | — | — | — | — |
-| LightweightCNN | — | — | — | — |
-| ResNet18 | — | — | — | — |
-| DenseNet40 | — | — | — | — |
-| **ViT** | — | — | — | — |
+| LogReg | 0.649 ± 0.067 | 0.621 ± 0.070 | 0.478 ± 0.095 | 0.683 ± 0.077 |
+| LightweightCNN | 0.810 ± 0.101 | 0.730 ± 0.080 | 0.501 ± 0.221 | 0.829 ± 0.060 |
+| ResNet18 | 0.727 ± 0.125 | 0.670 ± 0.080 | 0.441 ± 0.158 | 0.753 ± 0.056 |
+| DenseNet40 | 0.806 ± 0.107 | 0.487 ± 0.221 | 0.487 ± 0.221 | 0.784 ± 0.061 |
+| **ViT** | **0.841 ± 0.059** | **0.759 ± 0.058** | **0.550 ± 0.158** | **0.835 ± 0.040** |
 
 > 📝 **These cells are placeholders.** The published Table 1 values are not stored anywhere in this repository, and they have deliberately not been guessed. Paste the numbers from the paper — or from the `results_summary.csv` that the command above writes — into this table before publishing. The column order matches `format_table` in [superager/stats.py](superager/stats.py) exactly.
 
