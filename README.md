@@ -155,18 +155,7 @@ WARNING  ViT pretrained weights unavailable (...); random init.
 
 Each saved checkpoint contains `model_name`, `state_dict`, `seed`, and the tuned decision `threshold`, which is what lets `eval.py` rebuild the matching split and reuse the tuned operating point.
 
-## 🖥️ Interactive Demo
 
-A Streamlit app runs the full pipeline on a single uploaded scan:
-
-```bash
-pip install streamlit
-SUPERAGER_CKPT=results/checkpoints/vit_seed42.pt streamlit run streamlit_app.py
-```
-
-Upload a T1-weighted `.nii` or `.nii.gz` and it reports P(SuperAger), per-plane attention rollout maps, and the regional table. Without a checkpoint it still runs end to end on an untrained head, which is useful for verifying the install but produces meaningless numbers.
-
-The demo calls the same `build_input`, `attention_rollout`, and `region_scores` functions as `explain.py`. One stage is necessarily skipped: the per-site z-score (Sec. 3.2, stage 6) needs a whole cohort and cannot be applied to a single scan.
 
 ## 🔬 Method
 
