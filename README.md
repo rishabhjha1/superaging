@@ -1,11 +1,9 @@
-# Explainable Deep Learning for Classifying Cognitive Superagers from Structural MRI
+# Explainable Deep Learning for Classifying Cognitive SuperAgers from Structural MRI
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 
-Official implementation of *Explainable Deep Learning for Classifying Cognitive Superagers from Structural MRI*.
-
-This repository benchmarks five models on T1-weighted scans (ADNI and OASIS) to separate SuperAgers from typical agers, and applies explainability tools (attention rollout, Grad-CAM, LIME) to identify distinguishing brain regions without regional priors.
+Official implementation of *Explainable Deep Learning for Classifying Cognitive SuperAgers from Structural MRI* (Jha, Keenan, Gawryluk, and Mbilinyi). <!-- TODO: link the paper here once an arXiv / DOI / venue URL is available --> This repository benchmarks five models on T1-weighted scans (ADNI and OASIS) to separate SuperAgers from typical agers, and applies four explainability methods (attention rollout, Grad-CAM, LIME, and grid-based regional analysis) to identify distinguishing brain regions without regional priors.
 
 ![Explainability stack](Explainability%20Stack.png)
 
@@ -201,20 +199,18 @@ Configuration is centralised in [superager/config.py](superager/config.py). Ever
 If you use this code, please cite:
 
 ```bibtex
-@article{jha_superagers,
-  title   = {Explainable Deep Learning for Classifying Cognitive Superagers
-             from Structural MRI},
-  author  = {Jha, Rishabh},
-  journal = {TODO},
-  year    = {TODO},
-  note    = {Code: https://github.com/rishabhjha1/superaging}
+@misc{jha2026superager,
+  title  = {Explainable Deep Learning for Classifying Cognitive {SuperAgers} from Structural {MRI}},
+  author = {Jha, Rishabh and Keenan, Haley E. and Gawryluk, Jodie R. and Mbilinyi, Ashery},
+  year   = {2026},
+  note   = {Preprint; update with the published venue/DOI once available}
 }
 ```
 
+## Contributing
 
+Issues and pull requests are welcome. Please open an issue to discuss significant changes before submitting a PR.
 
 ## 📄 License
 
-[MIT](LICENSE).
-
-Note: ADNI and OASIS datasets are governed by their respective data use agreements, and ImageNet pretrained weights carry their own licenses. See [LICENSE](LICENSE) for details.
+MIT (see [LICENSE](LICENSE)). Note: ADNI and OASIS datasets are governed by their own data use agreements and are not covered by this license.

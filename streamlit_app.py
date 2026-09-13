@@ -36,6 +36,9 @@ PLANES = ("axial", "coronal", "sagittal")
 
 st.set_page_config(page_title="SuperAger explainability demo", layout="wide")
 
+cfg = Config()
+device = torch.device("cpu")
+
 
 @st.cache_resource(show_spinner="Loading model...")
 def load_model():

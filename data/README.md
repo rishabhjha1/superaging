@@ -1,122 +1,67 @@
-# Data
+# Data preparation
 
-No imaging data is distributed with this repository. You must obtain ADNI and
-OASIS access yourself and accept each provider's data use agreement:
+This repository does not distribute imaging data. ADNI and OASIS are each
+governed by their own data use agreement (DUA); request access directly from
+the cohorts and comply with their terms before use:
 
-- **ADNI** — https://adni.loni.usc.edu/data-samples/access-data/
-- **OASIS** — https://www.oasis-brains.org/#access
+- ADNI: https://adni.loni.usc.edu/
+- OASIS: https://www.oasis-brains.org/
 
-This directory holds your label file and, by default, the image roots that
-`train.py`, `eval.py`, and `explain.py` search.
-
-## Expected layout
+Once you have access, arrange the files as follows (or point `--roots` at
+wherever they already live):
 
 ```
 data/
 ├── labels.csv
-├── ADNI/            # any nesting; searched recursively for *.nii / *.nii.gz
-│   └── 003_S_1234/.../ADNI_003_S_1234_MR_MPRAGE.nii.gz
-└── OASIS/
-    └── OAS2_0045/.../OAS2_0045_MR1_mpr.nii.gz
+├── ADNI/       # T1-weighted .nii / .nii.gz files, any subdirectory depth
+└── OASIS/      # T1-weighted .nii / .nii.gz files, any subdirectory depth
 ```
 
-Directory structure below each root does not matter. `find_nifti_files` in
-[`superager/data.py`](../superager/data.py) walks each root recursively for
-`*.nii` and `*.nii.gz`, skipping macOS `._` resource forks. Point `--roots` at
-whatever directories you actually keep scans in:
+`train.py`, `eval.py`, and `explain.py` search each `--roots` directory
+recursively for `*.nii` / `*.nii.gz` files (see `find_nifti_files` in
+[`superager/data.py`](../superager/data.py)) and join them to `labels.csv` by
+subject ID.
 
-```bash
-python train.py --labels data/labels.csv --roots data/ADNI data/OASIS
-```
+## `labels.csv` schema
 
-## labels.csv
+One row per subject. Column names are matched case-insensitively; any of the
+aliases below is accepted.
 
-One row per subject. Column names are matched case-insensitively after
-stripping whitespace, and several spellings are accepted:
-
-| Field | Accepted column names | Required |
-|---|---|---|
-| Subject | `subject`, `subject_id`, `subjectid`, `id`, `participant_id` | yes |
-| Label | `label`, `diagnosis`, `group`, `class`, `dx` | yes |
-| Age | `age`, `age_at_scan` | no |
+| Field   | Accepted column names                              | Required | Notes |
+|---------|-----------------------------------------------------|----------|-------|
+| subject | `subject`, `subject_id`, `subjectid`, `id`, `participant_id` | yes | Must match (or be a substring/superstring of) the subject ID parsed from the filename |
+| label   | `label`, `diagnosis`, `group`, `class`, `dx`         | yes | `1`/`superager`/`sa`/`super`/`super_ager` → SuperAger; `0`/`normal`/`cn`/`control`/`typical`/`nondemented`/`normal_ager` → typical ager; anything else is dropped with a warning |
+| age     | `age`, `age_at_scan`                                 | no       | Enables the age-only sanity baseline in `train.py` (paper Sec. 3.1) |
 
 Example:
 
 ```csv
 subject,label,age
-003_S_1234,1,84
-003_S_5678,0,81
-OAS2_0045,superager,86
-OAS2_0091,control,83
+003_S_1234,SuperAger,81
+OAS2_0045_MR1,Normal,76
 ```
-
-### Label values
-
-Parsed by `_to_label` in [`superager/data.py`](../superager/data.py),
-case-insensitively:
-
-- **SuperAger (1)** — `1`, `superager`, `sa`, `super`, `super_ager`
-- **Typical ager (0)** — `0`, `normal`, `cn`, `control`, `typical`,
-  `nondemented`, `normal_ager`
-
-Anything else is dropped with a warning, so check the `Dropped N rows with
-unrecognised labels` line in the log before trusting a run.
-
-### Age
-
-Optional, but supplying it is worthwhile: `train.py` fits an age-only logistic
-baseline (Sec. 3.1) and records it in `run_manifest.json`. If the imaging models
-do not clear that baseline, they are recovering age, not SuperAger status.
 
 ## Subject ID parsing
 
-IDs are recovered from **file paths**, not from directory names alone, and then
-matched to the CSV:
+Subject IDs are extracted from the NIfTI filename/path, not assumed to be the
+filename stem, using cohort-specific patterns (`subject_id` in
+[`superager/data.py`](../superager/data.py)):
 
-- **ADNI** — the pattern `\d{3}_S_\d{4}` anywhere in the path, e.g. a file at
-  `data/ADNI/.../ADNI_003_S_1234_MR.nii.gz` yields subject `003_S_1234`.
-- **OASIS** — `OAS<n>_<digits>_MR<n>` or `OAS2_<4 digits>`, e.g. `OAS2_0045`.
-- **Neither** — the filename stem, uppercased.
+- **ADNI**: `\d{3}_S_\d{4}` (e.g. `003_S_1234`), which also encodes the
+  acquisition site as `ADNI_<site>` for site-stratified splitting.
+- **OASIS**: `OAS\d+[_-]\d+[_-]MR\d+` or `OAS2[_-]\d{4}` (e.g.
+  `OAS2_0045_MR1`); all OASIS scans are treated as one site.
+- Anything else falls back to the file's stem, uppercased.
 
-Before matching, CSV IDs are uppercased and `-` and `.` are converted to `_`, so
-`oas2-0045` matches `OAS2_0045`. If an exact match fails, a substring match is
-attempted in either direction. Unmatched subjects are reported:
+Only one scan per subject is kept (`collect_records` in `superager/data.py`)
+— this matters for OASIS-2, which is longitudinal, so that repeat sessions of
+the same subject cannot land on both sides of a cross-validation split.
 
-```
-WARNING  12 labelled subjects had no matching NIfTI (e.g. ['003_S_9999', ...])
-```
+## Labelling criteria used in the paper
 
-A large count here almost always means an ID formatting mismatch rather than
-missing files. Check the warning before interpreting any result.
-
-## One scan per subject
-
-`collect_records` keeps a **single scan per subject** (`drop_duplicates` on
-subject, first match in sorted path order). This is deliberate: OASIS-2 is
-longitudinal, and repeat sessions of one brain landing on both sides of a split
-would leak. Splits are additionally subject-grouped, so the two guards stack.
-
-## Sites
-
-Site is derived from the path, not from the CSV:
-
-- **ADNI** — the 3-digit site prefix, e.g. `003_S_1234` → site `ADNI_003`
-- **OASIS** — one pooled site, `OASIS`
-
-Splits are site-stratified where feasible. `train.py` writes `site_audit.csv`
-to the output directory and warns about single-class sites:
-
-```
-WARNING  8/42 sites are single-class (e.g. ['ADNI_011', ...]).
-```
-
-In those sites, site *is* the label. Site-aware stratification mitigates this
-confound but cannot remove it, so read `site_audit.csv` before quoting numbers.
-
-## Preprocessing cache
-
-`preprocess` caches the assembled `(N, 3, 224, 224)` array to
-`<outdir>/cache/X_<hash>.npy`. The hash covers the cohort size, image paths, and
-the preprocessing settings, so editing `labels.csv` or changing
-`size_2d` / `harmonize` / `ref_size` / `mask_threshold` invalidates it
-automatically. Pass `--no-cache` to force recomputation.
+ADNI SuperAgers follow the operationalization of Keenan et al. (RAVLT-based,
+≥60 age floor). OASIS lacks an episodic-memory instrument, so OASIS positives
+are selected on the Northwestern age criterion (≥80) with intact global
+cognition (CDR = 0, MMSE = 30) — a weaker selector than the ADNI one; see the
+paper (Sec. 3.1) for the label-noise implications this has for the reported
+AUCs.
