@@ -123,20 +123,20 @@ Checkpoints you train yourself are written to `<outdir>/checkpoints/<model>_seed
 
 ```
 superaging/
-├── train.py              # Entry point: benchmark all 5 models across seeds (Table 1)
-├── eval.py                # Entry point: reproduce Table 1 from released checkpoints
+├── train.py                # Entry point: benchmark all 5 models across seeds (Table 1)
+├── eval.py                 # Entry point: reproduce Table 1 from a trained checkpoint
 ├── explain.py              # Entry point: explainability stack for one checkpoint (Table 2, Fig. 2)
 ├── streamlit_app.py        # Interactive single-scan demo
-├── superager/               # Library code
-│   ├── config.py            # All hyperparameters (Config dataclass)
-│   ├── data.py               # Cohort assembly + 2.5D preprocessing pipeline
-│   ├── models.py              # LogReg, Lightweight CNN, ResNet-18, DenseNet-40, ViT-B/16
-│   ├── engine.py               # Training loop, metrics, age-only sanity baseline
-│   ├── splits.py                # Subject-grouped, site-stratified cross-validation
-│   ├── explain.py                 # Attention rollout, Grad-CAM, LIME, grid analysis
-│   ├── regions.py                  # Grid-to-region mapping and regional aggregation
-│   ├── stats.py                     # Paired significance tests
-│   └── plotting.py                   # Figures (seed summary, explainability stack)
+├── superager/              # Library code
+│   ├── config.py           # All hyperparameters (Config dataclass)
+│   ├── data.py             # Cohort assembly + 2.5D preprocessing pipeline
+│   ├── models.py           # LogReg, Lightweight CNN, ResNet-18, DenseNet-40, ViT-B/16
+│   ├── engine.py           # Training loop, metrics, age-only sanity baseline
+│   ├── splits.py           # Subject-grouped, site-stratified cross-validation
+│   ├── explain.py          # Attention rollout, Grad-CAM, LIME, grid analysis
+│   ├── regions.py          # Grid-to-region mapping and regional aggregation
+│   ├── stats.py            # Paired significance tests
+│   └── plotting.py         # Figures (seed summary, explainability stack)
 ├── data/README.md          # Expected data layout and labels.csv schema
 ├── environment.yml         # Conda environment spec
 └── requirements.txt        # Pip dependency spec

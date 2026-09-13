@@ -11,6 +11,7 @@ can be smoke-tested, but the predictions are meaningless.
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -48,10 +49,16 @@ def load_model():
 @st.cache_data(show_spinner="Preprocessing volume...")
 def preprocess(raw: bytes, name: str) -> np.ndarray:
     """Bytes from the uploader -> (3, size, size) float32, planes (axial, coronal, sagittal)."""
+    # nibabel reads from a path, so the upload is staged on disk. A per-call
+    # temporary file keeps this portable and safe for concurrent sessions.
     suffix = ".nii.gz" if name.endswith(".gz") else ".nii"
-    tmp = Path("/tmp") / f"upload{suffix}"
-    tmp.write_bytes(raw)
-    volume = np.squeeze(nib.as_closest_canonical(nib.load(str(tmp))).get_fdata())
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as fh:
+        fh.write(raw)
+        tmp = Path(fh.name)
+    try:
+        volume = np.squeeze(nib.as_closest_canonical(nib.load(str(tmp))).get_fdata())
+    finally:
+        tmp.unlink(missing_ok=True)
     normalised = normalise_volume(volume.astype(np.float32), threshold=cfg.mask_threshold)
     return triplanar(normalised, cfg.size_2d)
 
