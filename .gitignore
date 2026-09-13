@@ -1,21 +1,44 @@
-# Python
-__pycache__/
-*.pyc
-*.egg-info/
-.ipynb_checkpoints/
-
-# Outputs and caches produced by train.py / eval.py / explain.py
+# ---- run outputs ----
 results/
 checkpoints/
+*.pt
+*.pth
 
-# Imaging data (not distributed; see data/README.md)
-data/ADNI/
-data/OASIS/
-data/labels.csv
-data/*.nii
-data/*.nii.gz
+# ---- preprocessing cache ----
+cache/
+*.npy
 
-# Editor / OS
+# ---- local data (never commit ADNI/OASIS scans or labels) ----
+data/*
+!data/README.md
+*.nii
+*.nii.gz
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.Python
+
+# ---- environments ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- tooling caches ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# ---- editors / OS ----
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+
+# ---- streamlit ----
+.streamlit/secrets.toml
