@@ -199,7 +199,8 @@ class ViTNet(nn.Module):
     """ViT-B/16 adapted to a few hundred subjects (Sec. 3.3).
 
     Five adaptations, each scaling capacity down to the data:
-      (i)   frozen backbone -- 86M parameters drop to ~0.6M trainable
+      (i)   frozen backbone -- 86M parameters drop to ~0.20M trainable
+            under the shipped vit_hidden_dim=256
       (ii)  head-only optimisation at lr 1e-4, weight decay 5e-5, so no drift
             from the ImageNet initialisation under the natural-image-to-MRI shift
       (iii) mild augmentation only (see engine.augment)
