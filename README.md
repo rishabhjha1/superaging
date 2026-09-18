@@ -161,8 +161,6 @@ Each saved checkpoint contains `model_name`, `state_dict`, `seed`, and the tuned
 
 **Models:** ViT-B/16 adapted via a frozen backbone (86.0M total parameters, 0.20M trainable under the shipped `vit_hidden_dim=256`), parameter-free mean-pooling view fusion, and four-view test-time averaging. Benchmarked against LogReg, a lightweight CNN, frozen ResNet-18, and DenseNet-40.
 
-> ⚠️ The class docstring in [superager/models.py](superager/models.py) describes the head as "~0.6M trainable", which corresponds to `vit_hidden_dim=768`, not the `256` that [superager/config.py](superager/config.py) actually defaults to. The measured count at the shipped default is 0.20M. Reconcile the default against the paper before publishing — if the reported results used a 768-wide head, the default config does not reproduce them.
-
 **Optimization:** AdamW, cosine annealing with warmup, class-balanced cross-entropy with label smoothing, and early stopping.
 
 **Splits:** Subject-grouped and site-stratified 5-fold cross-validation. One scan per subject, so longitudinal OASIS-2 sessions cannot straddle a split.
